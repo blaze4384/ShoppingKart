@@ -1,6 +1,7 @@
 package com.shoppingkart.app.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,20 +13,29 @@ import com.shoppingkart.app.response.UserResponse;
 import com.shoppingkart.app.service.LoginService;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/shoppingkart")
 public class LoginController {
 
 	@Autowired
 	LoginService service;
 	
 	@PostMapping("/create")
-	public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
+	public ResponseEntity<?> createUser(@RequestBody UserRequest request) {
 		UserResponse response = service.createUser(request);
 		if (response != null)
-			return ResponseEntity.ok().body(response);
+			return new ResponseEntity<UserResponse>(response,HttpStatus.CREATED);
 
-		return ResponseEntity.badRequest().build();
+		return new ResponseEntity<String>("User already registered", HttpStatus.CONFLICT);
 
+	}
+	
+	@PostMapping("/login")
+	public ResponseEntity<?> loginUser(@RequestBody UserRequest request){
+		boolean response = service.validateUser(request);
+		if(response == true)
+			return new ResponseEntity<Boolean>(response,HttpStatus.OK);
+		
+		return new ResponseEntity<String>("check userid or password", HttpStatus.UNAUTHORIZED);
 	}
 
 }
