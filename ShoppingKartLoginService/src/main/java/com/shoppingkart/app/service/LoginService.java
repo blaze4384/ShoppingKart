@@ -7,4 +7,6 @@ public interface LoginService {
 
 	UserResponse createUser(UserRequest userRequest);
 
+	boolean validateUser(UserRequest request);
+
 }
